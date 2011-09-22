@@ -36,7 +36,10 @@ int ticBestMoveAlphaBeta ( int player, int &bestMove, int alpha, int beta )
   else {
     bestScore = alpha;
     int not_used;
-    for ( int i = 0; i < 9 && bestScore < beta; i++ ) {	//try each square
+    for ( int i = 0; i < 9; i++ ) {	//try each square
+      printf("%d, %d", bestScore,beta);
+      if (bestScore > beta)
+        break;
       if ( isEmpty ( i ) ) {
 	      mark ( i, player );		//execute move
 	      /*

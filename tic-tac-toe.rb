@@ -1,5 +1,4 @@
 #encoding:UTF-8
-require './tree.rb'
 
 WIN = 1
 DRAW = 0
@@ -41,7 +40,8 @@ def evaluate(board, player)
     return false
   end
   win.each do |test|
-    if board[test[0]] == player && board[test[1]] == player && board[test[2]] == player
+    r = board.values_at(*test).uniq
+    if r.size == 1 && r[0] == player
       return true
     end
   end
@@ -49,7 +49,7 @@ def evaluate(board, player)
 end
 
 
-def _not(player)
+def other(player)
   if player == PLAYER1
     PLAYER2
   else
@@ -57,31 +57,22 @@ def _not(player)
   end
 end
 
+
 def bestMove(board, player, alpha, beta)
-  best_score = nil
-  if evaluate(board,player)
-    return WIN
-  else
-    if evaluate(board,_not(player))
-      return LOSS
-    else
-      if full_board?(board)
-        return DRAW
-      else
-        best_score = alpha
-        for i = 0, i < 8 && best_score < beta, i++
-          if position_empty?(board, i)
-            mark(board, player, i)
-            score = -bestMove(board,_not(player), -beta, -alpha)
-            if score > best_score
-              puts i
-              $best_move = i
-              best_score = score
-            end
-            unmark(board, i)
-          end
-        end
+  return DRAW if full_board?(board)
+  return WIN  if evaluate(board,player)
+  return LOSS if evaluate(board,other(player))
+  best_score = alpha
+  (0..8).each do |i|
+    break if best_score > beta
+    if position_empty?(board, i)
+      mark(board, player, i)
+      score = -bestMove(board,other(player), -beta, -alpha)
+      if score > best_score
+        $best_move = i
+        best_score = score
       end
+      unmark(board, i)
     end
   end
   return best_score
